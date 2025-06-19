@@ -5,15 +5,17 @@ function usage() {
   printf "Usage: $0 OPTION...
   -c DIR      Path to CDT installation/build directory. (Optional if using CDT installled at standard system location.)
   -l DIR      Path to Spring build directory. Optional, but must be specified to build tests.
+  -p NUM      Override the number of CPU cores used for building.
   -h          Print this help menu.
   \\n" "$0" 1>&2
   exit 1
 }
 
 BUILD_TESTS=OFF
+CPU_OVERRIDE=""
 
 if [ $# -ne 0 ]; then
-  while getopts "c:l:h" opt; do
+  while getopts "c:l:p:h" opt; do
     case "${opt}" in
       c )
         CDT_INSTALL_DIR=$(realpath $OPTARG)
@@ -21,6 +23,9 @@ if [ $# -ne 0 ]; then
       l )
         SPRING_BUILD_DIR=$(realpath $OPTARG)
         BUILD_TESTS=ON
+      ;;
+      p )
+        CPU_OVERRIDE="$OPTARG"
       ;;
       h )
         usage
@@ -76,7 +81,7 @@ fi
 printf "\t=========== Building system-contracts ===========\n\n"
 RED='\033[0;31m'
 NC='\033[0m'
-CPU_CORES=$(getconf _NPROCESSORS_ONLN)
+CPU_CORES=${CPU_OVERRIDE:-$(getconf _NPROCESSORS_ONLN)}
 mkdir -p build
 pushd build &> /dev/null
 cmake -DBUILD_TESTS=${BUILD_TESTS} ${SPRING_DIR_CMAKE_OPTION} ${CDT_DIR_CMAKE_OPTION} ../

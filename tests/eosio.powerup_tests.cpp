@@ -87,9 +87,9 @@ struct powerup_tester : eosio_system_tester {
                           push_action("proxyaccount"_n, "regproxy"_n, mvo()("proxy", "proxyaccount")("isproxy", true)));
       BOOST_REQUIRE_EQUAL("", vote("rexholder111"_n, {}, "proxyaccount"_n));
       BOOST_REQUIRE_EQUAL("", push_action("rexholder111"_n, "deposit"_n,
-                                          mvo()("owner", "rexholder111")("amount", asset::from_string("1.0000 TST"))));
+                                          mvo()("owner", "rexholder111")("amount", core_sym::from_string("1.0000"))));
       BOOST_REQUIRE_EQUAL("", push_action("rexholder111"_n, "buyrex"_n,
-                                          mvo()("from", "rexholder111")("amount", asset::from_string("1.0000 TST"))));
+                                          mvo()("from", "rexholder111")("amount", core_sym::from_string("1.0000"))));
    }
 
    template <typename F>
@@ -102,8 +102,8 @@ struct powerup_tester : eosio_system_tester {
       config.net.target_timestamp     = time_point_sec(control->pending_block_time() + fc::days(100));
       config.net.exponent             = 2;
       config.net.decay_secs           = fc::days(1).to_seconds();
-      config.net.min_price            = asset::from_string("0.0000 TST");
-      config.net.max_price            = asset::from_string("1000000.0000 TST");
+      config.net.min_price            = core_sym::from_string("0.0000");
+      config.net.max_price            = core_sym::from_string("1000000.0000");
 
       config.cpu.current_weight_ratio = powerup_frac;
       config.cpu.target_weight_ratio  = powerup_frac / 100;
@@ -111,11 +111,11 @@ struct powerup_tester : eosio_system_tester {
       config.cpu.target_timestamp     = time_point_sec(control->pending_block_time() + fc::days(100));
       config.cpu.exponent             = 2;
       config.cpu.decay_secs           = fc::days(1).to_seconds();
-      config.cpu.min_price            = asset::from_string("0.0000 TST");
-      config.cpu.max_price            = asset::from_string("1000000.0000 TST");
+      config.cpu.min_price            = core_sym::from_string("0.0000");
+      config.cpu.max_price            = core_sym::from_string("1000000.0000");
 
       config.powerup_days    = 30;
-      config.min_powerup_fee = asset::from_string("1.0000 TST");
+      config.min_powerup_fee = core_sym::from_string("1.0000");
 
       f(config);
       return config;
@@ -263,14 +263,14 @@ BOOST_FIXTURE_TEST_CASE(config_tests, powerup_tester) try {
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("powerup_days must be > 0"),
                        configbw(make_config([&](auto& c) { c.powerup_days = 0; })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_powerup_fee doesn't match core symbol"), configbw(make_config([&](auto& c) {
-                          c.min_powerup_fee = asset::from_string("1000000.000 TST");
+                          c.min_powerup_fee = core_sym::from_string("1000000.000");
                        })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_powerup_fee does not have a default value"),
                        configbw(make_config([&](auto& c) { c.min_powerup_fee = {}; })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_powerup_fee must be positive"),
-                       configbw(make_config([&](auto& c) { c.min_powerup_fee = asset::from_string("0.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.min_powerup_fee = core_sym::from_string("0.0000"); })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_powerup_fee must be positive"),
-                       configbw(make_config([&](auto& c) { c.min_powerup_fee = asset::from_string("-1.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.min_powerup_fee = core_sym::from_string("-1.0000"); })));
 
    // net assertions
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("current_weight_ratio is too large"),
@@ -300,21 +300,21 @@ BOOST_FIXTURE_TEST_CASE(config_tests, powerup_tester) try {
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price does not have a default value"),
                        configbw(make_config([&](auto& c) { c.net.max_price = {}; })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price doesn't match core symbol"), configbw(make_config([&](auto& c) {
-                          c.net.max_price = asset::from_string("1000000.000 TST");
+                          c.net.max_price = core_sym::from_string("1000000.000");
                        })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price must be positive"),
-                       configbw(make_config([&](auto& c) { c.net.max_price = asset::from_string("0.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.net.max_price = core_sym::from_string("0.0000"); })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price must be positive"),
-                       configbw(make_config([&](auto& c) { c.net.max_price = asset::from_string("-1.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.net.max_price = core_sym::from_string("-1.0000"); })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_price doesn't match core symbol"), configbw(make_config([&](auto& c) {
-                          c.net.min_price = asset::from_string("1000000.000 TST");
+                          c.net.min_price = core_sym::from_string("1000000.000");
                        })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_price must be non-negative"),
-                       configbw(make_config([&](auto& c) { c.net.min_price = asset::from_string("-1.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.net.min_price = core_sym::from_string("-1.0000"); })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_price cannot exceed max_price"),
                        configbw(make_config([&](auto& c) {
-                          c.net.min_price = asset::from_string("3.0000 TST");
-                          c.net.max_price = asset::from_string("2.0000 TST");
+                          c.net.min_price = core_sym::from_string("3.0000");
+                          c.net.max_price = core_sym::from_string("2.0000");
                        })));
 
    // cpu assertions
@@ -345,21 +345,21 @@ BOOST_FIXTURE_TEST_CASE(config_tests, powerup_tester) try {
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price does not have a default value"),
                        configbw(make_config([&](auto& c) { c.cpu.max_price = {}; })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price doesn't match core symbol"), configbw(make_config([&](auto& c) {
-                          c.cpu.max_price = asset::from_string("1000000.000 TST");
+                          c.cpu.max_price = core_sym::from_string("1000000.000");
                        })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price must be positive"),
-                       configbw(make_config([&](auto& c) { c.cpu.max_price = asset::from_string("0.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.cpu.max_price = core_sym::from_string("0.0000"); })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("max_price must be positive"),
-                       configbw(make_config([&](auto& c) { c.cpu.max_price = asset::from_string("-1.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.cpu.max_price = core_sym::from_string("-1.0000"); })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_price doesn't match core symbol"), configbw(make_config([&](auto& c) {
-                          c.cpu.min_price = asset::from_string("1000000.000 TST");
+                          c.cpu.min_price = core_sym::from_string("1000000.000");
                        })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_price must be non-negative"),
-                       configbw(make_config([&](auto& c) { c.cpu.min_price = asset::from_string("-1.0000 TST"); })));
+                       configbw(make_config([&](auto& c) { c.cpu.min_price = core_sym::from_string("-1.0000"); })));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_price cannot exceed max_price"),
                        configbw(make_config([&](auto& c) {
-                          c.cpu.min_price = asset::from_string("3.0000 TST");
-                          c.cpu.max_price = asset::from_string("2.0000 TST");
+                          c.cpu.min_price = core_sym::from_string("3.0000");
+                          c.cpu.max_price = core_sym::from_string("2.0000");
                        })));
 } // config_tests
 FC_LOG_AND_RETHROW()
@@ -504,36 +504,36 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
 
       BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("powerup hasn't been initialized"), //
                           t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac / 4, powerup_frac / 8,
-                                   asset::from_string("1.000 TST")));
+                                   core_sym::from_string("1.000")));
 
       BOOST_REQUIRE_EQUAL("", t.configbw(t.make_config([&](auto& config) {
          config.net.current_weight_ratio = powerup_frac;
          config.net.target_weight_ratio  = powerup_frac;
          config.net.assumed_stake_weight = stake_weight;
          config.net.exponent             = 1;
-         config.net.min_price            = asset::from_string("1000000.0000 TST");
-         config.net.max_price            = asset::from_string("1000000.0000 TST");
+         config.net.min_price            = core_sym::from_string("1000000.0000");
+         config.net.max_price            = core_sym::from_string("1000000.0000");
 
          config.cpu.current_weight_ratio = powerup_frac;
          config.cpu.target_weight_ratio  = powerup_frac;
          config.cpu.assumed_stake_weight = stake_weight;
          config.cpu.exponent             = 1;
-         config.cpu.min_price            = asset::from_string("1000000.0000 TST");
-         config.cpu.max_price            = asset::from_string("1000000.0000 TST");
+         config.cpu.min_price            = core_sym::from_string("1000000.0000");
+         config.cpu.max_price            = core_sym::from_string("1000000.0000");
 
          config.powerup_days    = 30;
-         config.min_powerup_fee = asset::from_string("1.0000 TST");
+         config.min_powerup_fee = core_sym::from_string("1.0000");
       })));
 
       BOOST_REQUIRE_EQUAL(
             t.wasm_assert_msg("max_payment doesn't match core symbol"), //
-            t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, powerup_frac, asset::from_string("1.000 TST")));
+            t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, powerup_frac, core_sym::from_string("1.000")));
       BOOST_REQUIRE_EQUAL(
             t.wasm_assert_msg("market doesn't have resources available"), //
-            t.powerup("bob111111111"_n, "alice1111111"_n, 30, 0, powerup_frac, asset::from_string("1.0000 TST")));
+            t.powerup("bob111111111"_n, "alice1111111"_n, 30, 0, powerup_frac, core_sym::from_string("1.0000")));
       BOOST_REQUIRE_EQUAL(
             t.wasm_assert_msg("market doesn't have resources available"), //
-            t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, 0, asset::from_string("1.0000 TST")));
+            t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, 0, core_sym::from_string("1.0000")));
 
       BOOST_REQUIRE_EQUAL("", t.configbw(t.make_default_config([&](auto& config) {
          // weight = stake_weight
@@ -558,7 +558,7 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //               total = 300000.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("300000.0000"));
       t.check_powerup("aaaaaaaaaaaa"_n, "aaaaaaaaaaaa"_n, 30, powerup_frac * .1, powerup_frac * .2,
-                     asset::from_string("300000.0000 TST"), net_weight * .1, cpu_weight * .2);
+                     core_sym::from_string("300000.0000"), net_weight * .1, cpu_weight * .2);
 
       // Start decay
       t.produce_block(fc::days(30) - fc::milliseconds(500));
@@ -580,7 +580,7 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //                                   total = 40000.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("40000.0001"));
       t.check_powerup("aaaaaaaaaaaa"_n, "aaaaaaaaaaaa"_n, 30, powerup_frac * .02, powerup_frac * .02,
-                     asset::from_string("40000.0001 TST"), net_weight * .02, cpu_weight * .02);
+                     core_sym::from_string("40000.0001"), net_weight * .02, cpu_weight * .02);
    }
 
    auto init = [](auto& t, bool rex) {
@@ -597,17 +597,17 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
          config.net.target_weight_ratio  = powerup_frac / 4;
          config.net.assumed_stake_weight = stake_weight;
          config.net.exponent             = 2;
-         config.net.max_price            = asset::from_string("2000000.0000 TST");
+         config.net.max_price            = core_sym::from_string("2000000.0000");
 
          // weight = stake_weight * 4 / 2
          config.cpu.current_weight_ratio = powerup_frac / 5;
          config.cpu.target_weight_ratio  = powerup_frac / 5;
          config.cpu.assumed_stake_weight = stake_weight / 2;
          config.cpu.exponent             = 3;
-         config.cpu.max_price            = asset::from_string("6000000.0000 TST");
+         config.cpu.max_price            = core_sym::from_string("6000000.0000");
 
          config.powerup_days    = 30;
-         config.min_powerup_fee = asset::from_string("1.0000 TST");
+         config.min_powerup_fee = core_sym::from_string("1.0000");
       })));
 
       if (rex)
@@ -626,26 +626,26 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       init(t, false);
       BOOST_REQUIRE_EQUAL(
             t.wasm_assert_msg("days doesn't match configuration"), //
-            t.powerup("bob111111111"_n, "alice1111111"_n, 20, powerup_frac, powerup_frac, asset::from_string("1.0000 TST")));
+            t.powerup("bob111111111"_n, "alice1111111"_n, 20, powerup_frac, powerup_frac, core_sym::from_string("1.0000")));
       BOOST_REQUIRE_EQUAL(                                   //
             t.wasm_assert_msg("net_frac can't be negative"), //
             t.powerup("bob111111111"_n, "alice1111111"_n, 30, -powerup_frac, powerup_frac,
-                     asset::from_string("1.0000 TST")));
+                     core_sym::from_string("1.0000")));
       BOOST_REQUIRE_EQUAL(                                   //
             t.wasm_assert_msg("cpu_frac can't be negative"), //
             t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, -powerup_frac,
-                     asset::from_string("1.0000 TST")));
+                     core_sym::from_string("1.0000")));
       BOOST_REQUIRE_EQUAL(                                    //
             t.wasm_assert_msg("net can't be more than 100%"), //
             t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac + 1, powerup_frac,
-                     asset::from_string("1.0000 TST")));
+                     core_sym::from_string("1.0000")));
       BOOST_REQUIRE_EQUAL(                                    //
             t.wasm_assert_msg("cpu can't be more than 100%"), //
             t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, powerup_frac + 1,
-                     asset::from_string("1.0000 TST")));
+                     core_sym::from_string("1.0000")));
       BOOST_REQUIRE_EQUAL(
-            t.wasm_assert_msg("max_payment is less than calculated fee: 3000000.0000 TST"), //
-            t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, powerup_frac, asset::from_string("1.0000 TST")));
+            t.wasm_assert_msg("max_payment is less than calculated fee: " + core_sym::from_string("3000000.0000").to_string()), //
+            t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac, powerup_frac, core_sym::from_string("1.0000")));
    }
 
    // net:100%, cpu:100%
@@ -655,9 +655,9 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("3000000.0000"));
       BOOST_REQUIRE_EQUAL(
             t.wasm_assert_msg("calculated fee is below minimum; try powering up with more resources"),
-            t.powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, 10, 10, asset::from_string("3000000.0000 TST")));
+            t.powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, 10, 10, core_sym::from_string("3000000.0000")));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac, powerup_frac,
-                     asset::from_string("3000000.0000 TST"), net_weight, cpu_weight);
+                     core_sym::from_string("3000000.0000"), net_weight, cpu_weight);
 
       BOOST_REQUIRE_EQUAL( //
             t.wasm_assert_msg("weight can't shrink below utilization"),
@@ -694,14 +694,14 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //                       total = 218000.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("218000.0001"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac * .3, powerup_frac * .4,
-                     asset::from_string("218000.0001 TST"), net_weight * .3, cpu_weight * .4);
+                     core_sym::from_string("218000.0001"), net_weight * .3, cpu_weight * .4);
 
       // (.35 ^ 2) * 2000000.0000 / 2 -  90000.0000 =  32500.0000
       // (.5  ^ 3) * 6000000.0000 / 3 - 128000.0000 = 122000.0000
       //                                      total = 154500.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("154500.0000"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac * .05, powerup_frac * .10,
-                     asset::from_string("154500.0000 TST"), net_weight * .05, cpu_weight * .10);
+                     core_sym::from_string("154500.0000"), net_weight * .05, cpu_weight * .10);
    }
 
    // net:50%, cpu:50% (but with non-zero min_price and also an exponent of 2 to simplify the math)
@@ -710,17 +710,17 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       init(t, true);
       BOOST_REQUIRE_EQUAL("", t.configbw(t.make_default_config([&](auto& config) {
          config.cpu.exponent             = 2;
-         config.net.min_price            = asset::from_string("1200000.0000 TST");
-         config.net.max_price            = asset::from_string("2000000.0000 TST");
+         config.net.min_price            = core_sym::from_string("1200000.0000");
+         config.net.max_price            = core_sym::from_string("2000000.0000");
 
          config.cpu.exponent             = 2;
-         config.cpu.min_price            = asset::from_string("4000000.0000 TST");
-         config.cpu.max_price            = asset::from_string("6000000.0000 TST");
+         config.cpu.min_price            = core_sym::from_string("4000000.0000");
+         config.cpu.max_price            = core_sym::from_string("6000000.0000");
       })));
 
-      // At 0% utilization for both NET and CPU, the cost (in TST) for renting an infinitesimal amount of resources (dr) is
+      // At 0% utilization for both NET and CPU, the cost (in EOS) for renting an infinitesimal amount of resources (dr) is
       //    1200000.0000 * dr for NET and 4000000.0000 * dr for CPU.
-      // At 50% utilization for both NET and CPU, the cost (in TST for renting an infinitesimal amount of resources (dr) is
+      // At 50% utilization for both NET and CPU, the cost (in EOS for renting an infinitesimal amount of resources (dr) is
       //    1600000.0000 * dr for NET and 5000000.0000 * dr for CPU.
 
       // The fee for renting 50% of NET (starting from 0% utilization) is expected to be somewhere between
@@ -737,7 +737,7 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //                                             total = 2950000.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("2950000.0000"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac * .5, powerup_frac * .5,
-                     asset::from_string("2950000.0000 TST"), net_weight * .5, cpu_weight * .5);
+                     core_sym::from_string("2950000.0000"), net_weight * .5, cpu_weight * .5);
    }
 
    {
@@ -746,20 +746,20 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       init(t, true);
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("3000000.0000"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac, powerup_frac,
-                     asset::from_string("3000000.0000 TST"), net_weight, cpu_weight);
+                     core_sym::from_string("3000000.0000"), net_weight, cpu_weight);
 
       // No more available for 30 days
       BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("market doesn't have enough resources available"), //
                           t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac / 1000, powerup_frac / 1000,
-                                   asset::from_string("1.0000 TST")));
+                                   core_sym::from_string("1.0000")));
       t.produce_block(fc::days(29));
       BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("market doesn't have enough resources available"), //
                           t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac / 1000, powerup_frac / 1000,
-                                   asset::from_string("1.0000 TST")));
+                                   core_sym::from_string("1.0000")));
       t.produce_block(fc::days(1) - fc::milliseconds(1500));
       BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("market doesn't have enough resources available"), //
                           t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac / 1000, powerup_frac / 1000,
-                                   asset::from_string("1.0000 TST")));
+                                   core_sym::from_string("1.0000")));
       t.produce_block(fc::milliseconds(500));
 
       // immediate renewal: adjusted_utilization doesn't have time to fall
@@ -769,20 +769,20 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //                    total = 8000000.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("8000000.0000"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac, powerup_frac,
-                     asset::from_string("8000000.0000 TST"), 0, 0);
+                     core_sym::from_string("8000000.0000"), 0, 0);
 
       // No more available for 30 days
       BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("market doesn't have enough resources available"), //
                           t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac / 1000, powerup_frac / 1000,
-                                   asset::from_string("1.0000 TST")));
+                                   core_sym::from_string("1.0000")));
       t.produce_block(fc::days(29));
       BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("market doesn't have enough resources available"), //
                           t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac / 1000, powerup_frac / 1000,
-                                   asset::from_string("1.0000 TST")));
+                                   core_sym::from_string("1.0000")));
       t.produce_block(fc::days(1) - fc::milliseconds(1000));
       BOOST_REQUIRE_EQUAL(t.wasm_assert_msg("market doesn't have enough resources available"), //
                           t.powerup("bob111111111"_n, "alice1111111"_n, 30, powerup_frac / 1000, powerup_frac / 1000,
-                                   asset::from_string("1.0000 TST")));
+                                   core_sym::from_string("1.0000")));
 
       // Start decay
       t.produce_block(fc::milliseconds(1000));
@@ -814,7 +814,7 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //                                                                         total = 3028230.6476
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("3028229.8795"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac, powerup_frac,
-                     asset::from_string("3028229.8795 TST"), net_weight, cpu_weight);
+                     core_sym::from_string("3028229.8795"), net_weight, cpu_weight);
    }
 
    {
@@ -827,7 +827,7 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //                       total = 26000.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("26000.0002"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac * .1, powerup_frac * .2,
-                     asset::from_string("26000.0002 TST"), net_weight * .1, cpu_weight * .2);
+                     core_sym::from_string("26000.0002"), net_weight * .1, cpu_weight * .2);
 
       t.produce_block(fc::days(15) - fc::milliseconds(500));
 
@@ -837,7 +837,7 @@ BOOST_AUTO_TEST_CASE(rent_tests) try {
       //                                    total = 192000.0000
       t.transfer(config::system_account_name, "aaaaaaaaaaaa"_n, core_sym::from_string("192000.0001"));
       t.check_powerup("aaaaaaaaaaaa"_n, "bbbbbbbbbbbb"_n, 30, powerup_frac * .2, powerup_frac * .2,
-                     asset::from_string("192000.0001 TST"), net_weight * .2, cpu_weight * .2);
+                     core_sym::from_string("192000.0001"), net_weight * .2, cpu_weight * .2);
 
       // Start decay
       t.produce_block(fc::days(15) - fc::milliseconds(1000));

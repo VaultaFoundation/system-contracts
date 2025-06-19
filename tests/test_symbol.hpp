@@ -1,6 +1,6 @@
 #pragma once
 
-#define CORE_SYM_NAME "TST"
+#define CORE_SYM_NAME "EOS"
 #define CORE_SYM_PRECISION 4
 
 #define _STRINGIZE1(x) #x
@@ -12,5 +12,11 @@
 struct core_sym {
    static inline eosio::chain::asset from_string(const std::string& s) {
      return eosio::chain::asset::from_string(s + " " CORE_SYM_NAME);
+   }
+};
+
+struct vaulta_sym {
+   static inline eosio::chain::asset from_string(const std::string& s) {
+     return eosio::chain::asset::from_string(s + " " "A");
    }
 };

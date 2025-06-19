@@ -2612,14 +2612,14 @@ BOOST_FIXTURE_TEST_CASE(votepay_share_update_order, eosio_system_tester, * boost
       signed_transaction trx;
       set_transaction_headers(trx);
 
-      trx.actions.emplace_back( get_action( config::system_account_name, "claimrewards"_n, { {carol, config::active_name} },
+      trx.actions.emplace_back( get_action( "core.vaulta"_n, "claimrewards"_n, { {carol, config::active_name} },
                                             mvo()("owner", carol) ) );
 
       std::vector<account_name> prods = { carol, emily };
       trx.actions.emplace_back( get_action( config::system_account_name, "voteproducer"_n, { {alice, config::active_name} },
                                             mvo()("voter", alice)("proxy", name(0))("producers", prods) ) );
 
-      trx.actions.emplace_back( get_action( config::system_account_name, "claimrewards"_n, { {emily, config::active_name} },
+      trx.actions.emplace_back( get_action( "core.vaulta"_n, "claimrewards"_n, { {emily, config::active_name} },
                                             mvo()("owner", emily) ) );
 
       trx.sign( get_private_key( carol, "active" ), control->get_chain_id() );

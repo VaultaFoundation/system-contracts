@@ -63,9 +63,11 @@ BOOST_FIXTURE_TEST_CASE( bpay_test, eosio_system_tester ) try {
    {
       auto prod = producer_names[11];
       BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( prod ) );
+      BOOST_REQUIRE_EQUAL( vaulta_sym::from_string("0.0000"), get_vaulta_balance( prod ) );
       BOOST_REQUIRE_EQUAL( success(), bpay_claimrewards( prod ) );
-      BOOST_REQUIRE_EQUAL( core_sym::from_string("95.2380"), get_balance( prod ) );
-      BOOST_REQUIRE_EQUAL( true, get_bpay_rewards(prod).is_null() );   
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( prod ) );
+      BOOST_REQUIRE_EQUAL( vaulta_sym::from_string("95.2380"), get_vaulta_balance( prod ) );
+      BOOST_REQUIRE_EQUAL( true, get_bpay_rewards(prod).is_null() );
 
       // should still have rewards for another producer
       BOOST_REQUIRE_EQUAL( get_bpay_rewards(producer_names[10])["quantity"].as<asset>(), core_sym::from_string("95.2380") );
@@ -74,17 +76,21 @@ BOOST_FIXTURE_TEST_CASE( bpay_test, eosio_system_tester ) try {
    // Should be able to claim rewards from a producer that is no longer active
    {
       BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( inactive ) );
+      BOOST_REQUIRE_EQUAL( vaulta_sym::from_string("0.0000"), get_vaulta_balance( inactive ) );
       BOOST_REQUIRE_EQUAL( success(), bpay_claimrewards( inactive ) );
-      BOOST_REQUIRE_EQUAL( core_sym::from_string("47.6190"), get_balance( inactive ) );
-      BOOST_REQUIRE_EQUAL( true, get_bpay_rewards(inactive).is_null() );   
+      BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( inactive ) );
+      BOOST_REQUIRE_EQUAL( vaulta_sym::from_string("47.6190"), get_vaulta_balance( inactive ) );
+      BOOST_REQUIRE_EQUAL( true, get_bpay_rewards(inactive).is_null() );
    }
 
    // Should not have rewards for a producer that was never active
    {
       BOOST_REQUIRE_EQUAL( true, get_bpay_rewards(standby).is_null() );
       BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( standby ) );
+      BOOST_REQUIRE_EQUAL( vaulta_sym::from_string("0.0000"), get_vaulta_balance( standby ) );
       BOOST_REQUIRE_EQUAL( wasm_assert_msg("no rewards to claim"), bpay_claimrewards( standby ) );
       BOOST_REQUIRE_EQUAL( core_sym::from_string("0.0000"), get_balance( standby ) );
+      BOOST_REQUIRE_EQUAL( vaulta_sym::from_string("0.0000"), get_vaulta_balance( standby ) );
    }
 
    // Tokens transferred from the eosio account should be ignored

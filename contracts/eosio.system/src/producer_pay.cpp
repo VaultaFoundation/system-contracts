@@ -79,6 +79,11 @@ namespace eosiosystem {
    }
 
    void system_contract::claimrewards( const name& owner ) {
+      check(
+         eosio::get_sender() == "core.vaulta"_n,
+         "EOS has been rebranded to Vaulta. This action must now be called from the core.vaulta contract."
+      );
+      
       require_auth( owner );
 
       execute_next_schedule();

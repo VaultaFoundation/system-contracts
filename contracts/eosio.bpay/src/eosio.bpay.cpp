@@ -9,8 +9,15 @@ void bpay::claimrewards( const name owner ) {
 
     const auto& row = _rewards.get( owner.value, "no rewards to claim" );
 
-    eosio::token::transfer_action transfer( "eosio.token"_n, { get_self(), "active"_n });
-    transfer.send( get_self(), owner, row.quantity, "producer block pay" );
+    {   // swap to vaulta token
+        eosio::token::transfer_action transfer( "eosio.token"_n, { get_self(), "active"_n });
+        transfer.send( get_self(), "core.vaulta"_n, row.quantity, "producer block pay (swap)" );
+    }
+
+    {   // send vaulta tokens to claimer
+        eosio::token::transfer_action transfer( "core.vaulta"_n, { get_self(), "active"_n });
+        transfer.send( get_self(), owner, asset(row.quantity.amount, symbol("A", 4)), "producer block pay" );
+    }
 
     _rewards.erase(row);
 }

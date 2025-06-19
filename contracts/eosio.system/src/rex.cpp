@@ -25,6 +25,11 @@ namespace eosiosystem {
 
    void system_contract::deposit( const name& owner, const asset& amount )
    {
+      check(
+         eosio::get_sender() == "core.vaulta"_n,
+         "EOS has been rebranded to Vaulta. This action must now be called from the core.vaulta contract."
+      );
+
       require_auth( owner );
 
       check( amount.symbol == core_symbol(), "must deposit core token" );
@@ -39,6 +44,11 @@ namespace eosiosystem {
 
    void system_contract::withdraw( const name& owner, const asset& amount )
    {
+      check(
+         eosio::get_sender() == "core.vaulta"_n,
+         "EOS has been rebranded to Vaulta. This action must now be called from the core.vaulta contract."
+      );
+
       require_auth( owner );
 
       check( amount.symbol == core_symbol(), "must withdraw core token" );
@@ -74,6 +84,11 @@ namespace eosiosystem {
 
    void system_contract::unstaketorex( const name& owner, const name& receiver, const asset& from_net, const asset& from_cpu )
    {
+      check(
+         eosio::get_sender() == "core.vaulta"_n,
+         "EOS has been rebranded to Vaulta. This action must now be called from the core.vaulta contract."
+      );
+
       require_auth( owner );
 
       check( from_net.symbol == core_symbol() && from_cpu.symbol == core_symbol(), "asset must be core token" );
